@@ -563,7 +563,7 @@
 <section class="hero">
   <div class="hero-badge">🎁 LINE登録者限定 無料特典</div>
   <h1 class="hero-title">"強み"が<em>言語化</em>できる<br>体育会出身者のための<br>自己分析シート</h1>
-  <p class="hero-sub">競技経験を「仕事の強み」に変換する<br>5つのSTEPで、あなただけの答えを見つけよう。</p>
+  <p class="hero-sub">競技経験を「仕事の強み」に変換する<br>4つのSTEPで、あなただけの答えを見つけよう。</p>
   <div class="hero-concept">
     <strong>競技経験</strong> → <strong>強みの発見</strong> → <strong>市場価値への変換</strong>
   </div>
@@ -572,7 +572,7 @@
 <!-- ── Intro ── -->
 <div class="intro-wrap">
   <div class="intro-ttl">📋 このシートの使い方</div>
-  <p class="intro-body">5つのSTEPを順番に進めながら、競技経験を「仕事の強み」に変換していきます。正解はありません。まず思ったことを書いてみることが大切です。</p>
+  <p class="intro-body">4つのSTEPを順番に進めながら、競技経験を「仕事の強み」に変換していきます。正解はありません。まず思ったことを書いてみることが大切です。</p>
   <button class="reset-btn" onclick="resetAll()">🗑 入力内容をすべてリセットする</button>
   <div class="intro-steps">
     <div class="intro-step">
@@ -595,9 +595,9 @@
       <div class="intro-step-label">Will<br>Can Must</div>
     </div>
     <div class="intro-arrow">›</div>
-    <div class="intro-step">
-      <div class="intro-step-circle">5</div>
-      <div class="intro-step-label">強み<br>まとめ</div>
+    <div class="intro-step" style="background:linear-gradient(135deg,#1B3A6B,#2952A3);border-radius:10px;padding:8px 10px;color:#fff;text-align:center;">
+      <div style="font-size:1.2rem;">⚡</div>
+      <div class="intro-step-label" style="color:#F8C94E;font-size:0.6rem;">AI診断</div>
     </div>
   </div>
 </div>
@@ -790,41 +790,6 @@
   </div>
 </section>
 
-<!-- ── STEP 5 ── -->
-<section class="step-section">
-  <div class="step-card">
-    <div class="step-header">
-      <div class="step-num-badge">
-        <span class="step-label">STEP</span>
-        <span class="step-n">5</span>
-      </div>
-      <div>
-        <div class="step-title">私の強みまとめ</div>
-        <div class="step-sub">自己分析結果を言語化する</div>
-      </div>
-    </div>
-    <div class="step-body">
-      <div class="purpose-box">ここまでの内容を1枚に集約します。これがあなたの「自己PR」の核になります。</div>
-      <div class="fill-card">
-        <div class="fill-block">
-          <div class="fill-label">私の強みは</div>
-          <textarea class="fill-ta" placeholder="例）目標から逆算して継続できる力"></textarea>
-          <div style="font-size:0.85rem; color:var(--text); margin-top:4px;">です。</div>
-        </div>
-        <div class="fill-block">
-          <div class="fill-label">その強みは</div>
-          <textarea class="fill-ta" placeholder="例）大学4年間、毎日200本のシュート練習を欠かさず続けたこと"></textarea>
-          <div style="font-size:0.85rem; color:var(--text); margin-top:4px;">という経験で発揮されました。</div>
-        </div>
-        <div class="fill-block">
-          <div class="fill-label">仕事では</div>
-          <textarea class="fill-ta" placeholder="例）数値目標を立てて営業活動を日次で管理する場面"></textarea>
-          <div style="font-size:0.85rem; color:var(--text); margin-top:4px;">で活かせます。</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ── AI診断セクション ── -->
 <section class="diagnose-section">
@@ -1024,10 +989,7 @@ const DIAGNOSIS_LABELS = [
   '5年後の理想の働き方',
   '仕事を通じて成し遂げたいこと',
   '市場・社会に求められていること',
-  '市場価値を高めるために必要なこと',
-  '私の強みは',
-  'その強みが発揮された経験',
-  '仕事での活かし方'
+  '市場価値を高めるために必要なこと'
 ];
 
 async function startDiagnosis() {
