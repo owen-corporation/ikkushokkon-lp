@@ -530,7 +530,7 @@
 
     /* ── Print: A4縦 1〜2枚 ── */
     @media print {
-      @page { size: A4 portrait; margin: 8mm 10mm; }
+      @page { size: A4 landscape; margin: 8mm 10mm; }
 
       .top-bar, .type-switcher-wrap, .cta-wrap, footer,
       .download-section, .selfpr-copy-btn { display: none !important; }
@@ -1183,7 +1183,7 @@ function render(typeId) {
     <!-- Download PDF -->
     <div class="download-section">
       <button class="download-btn" onclick="window.print()">
-        ↓ 診断結果をPDFで保存（A4・1〜2枚）
+        ↓ 診断結果をPDFで保存（A4横・1〜2枚）
       </button>
     </div>
 
