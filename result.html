@@ -1182,9 +1182,14 @@ function render(typeId) {
 
     <!-- Download PDF -->
     <div class="download-section">
-      <button class="download-btn" onclick="window.print()">
+      <button class="download-btn" onclick="handleDownload()">
         ↓ 診断結果をPDFで保存（A4横・1〜2枚）
       </button>
+      <p class="download-mobile-note" style="display:none; margin-top:10px; font-size:0.8rem; color:#666; text-align:center;">
+        📱 スマホでPDFを保存するには<br>
+        Safariで開き直して「共有 → PDFを保存」をお試しください。<br>
+        またはPCからアクセスするとダウンロードできます。
+      </p>
     </div>
 
     <!-- Type switcher -->
@@ -1223,6 +1228,15 @@ function render(typeId) {
       <div class="footer-sub">© 2026 一職入魂 | 体育会出身者専門 転職サポート</div>
     </footer>
   `;
+}
+
+function handleDownload() {
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    document.querySelector('.download-mobile-note').style.display = 'block';
+  } else {
+    window.print();
+  }
 }
 
 function copySelfPR() {
