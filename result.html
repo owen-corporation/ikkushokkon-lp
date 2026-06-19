@@ -529,6 +529,27 @@
     .download-btn:hover { background: var(--navy); color: #fff; }
 
     /* ── Print: A4縦 1〜2枚 ── */
+    /* PDF撮影用スタイル */
+    body.capturing .top-bar, body.capturing .type-switcher-wrap,
+    body.capturing .cta-wrap, body.capturing footer,
+    body.capturing .download-section, body.capturing .selfpr-copy-btn { display: none !important; }
+    body.capturing { max-width: none !important; background: #fff !important; font-size: 7.5px !important; margin: 0 !important; padding: 0 !important; }
+    body.capturing #resultRoot { columns: 2 !important; column-gap: 8px !important; width: 1060px !important; max-width: none !important; padding: 16px 20px !important; box-sizing: border-box !important; }
+    body.capturing .type-hero { column-span: all !important; padding: 7px 12px 6px !important; margin-bottom: 5px !important; }
+    body.capturing .result-section { break-inside: avoid !important; margin: 0 0 4px !important; }
+    body.capturing .result-card { box-shadow: none !important; border: 1px solid #ddd !important; padding: 5px 7px !important; margin: 0 !important; }
+    body.capturing .section-title { font-size: 0.58rem !important; }
+    body.capturing .type-desc, body.capturing .strength-reason, body.capturing .reason-box,
+    body.capturing .env-card-text, body.capturing .advisor-text, body.capturing .skill-reason,
+    body.capturing .selfpr-card { font-size: 0.58rem !important; line-height: 1.45 !important; }
+    body.capturing .strength-item { padding: 3px 6px !important; margin-bottom: 2px !important; }
+    body.capturing .strength-name { font-size: 0.65rem !important; }
+    body.capturing .tag-job, body.capturing .tag-industry, body.capturing .culture-chip { font-size: 0.55rem !important; padding: 1px 5px !important; }
+    body.capturing .radar-wrap svg { max-width: 160px !important; }
+    body.capturing .radar-wrap { padding: 0 !important; }
+    body.capturing .env-card { padding: 4px 6px !important; }
+    body.capturing .skill-item { padding: 3px 6px !important; font-size: 0.62rem !important; }
+
     @media print {
       @page { size: 297mm 210mm; margin: 5mm 7mm; }
 
@@ -1252,39 +1273,37 @@ async function handleDownload() {
   btn.disabled = true;
 
   try {
+    // 2カラム横向きレイアウトで撮影
+    document.body.classList.add('capturing');
     const target = document.getElementById('resultRoot');
-
-    // 非表示要素を一時的に隠す
-    const hideEls = document.querySelectorAll('.type-switcher-wrap, .cta-wrap, footer, .download-section');
-    hideEls.forEach(el => el.style.visibility = 'hidden');
+    await new Promise(r => setTimeout(r, 300)); // レイアウト反映待ち
 
     const canvas = await html2canvas(target, {
       scale: 2,
       useCORS: true,
       logging: false,
-      backgroundColor: '#f5f6fa'
+      backgroundColor: '#f5f6fa',
+      width: 1060,
+      windowWidth: 1060
     });
 
-    hideEls.forEach(el => el.style.visibility = '');
+    document.body.classList.remove('capturing');
 
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-
     const pdfW = pdf.internal.pageSize.getWidth();
     const pdfH = pdf.internal.pageSize.getHeight();
     const ratio = canvas.width / canvas.height;
-    let imgW = pdfW - 14;
+    let imgW = pdfW - 10;
     let imgH = imgW / ratio;
-    if (imgH > pdfH - 10) {
-      imgH = pdfH - 10;
+    if (imgH > pdfH - 6) {
+      imgH = pdfH - 6;
       imgW = imgH * ratio;
     }
-    const x = (pdfW - imgW) / 2;
-    const y = (pdfH - imgH) / 2;
-
-    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', x, y, imgW, imgH);
+    pdf.addImage(canvas.toDataURL('image/jpeg', 0.93), 'JPEG', (pdfW - imgW) / 2, (pdfH - imgH) / 2, imgW, imgH);
     pdf.save('career-diagnosis.pdf');
   } catch (e) {
+    document.body.classList.remove('capturing');
     window.print();
   } finally {
     btn.textContent = '↓ 診断結果をPDFで保存（A4横・1枚）';
