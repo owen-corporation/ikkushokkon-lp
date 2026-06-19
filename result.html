@@ -529,26 +529,21 @@
     .download-btn:hover { background: var(--navy); color: #fff; }
 
     /* ── Print: A4縦 1〜2枚 ── */
-    /* PDF撮影用スタイル */
-    body.capturing .top-bar, body.capturing .type-switcher-wrap,
-    body.capturing .cta-wrap, body.capturing footer,
-    body.capturing .download-section, body.capturing .selfpr-copy-btn { display: none !important; }
-    body.capturing { max-width: none !important; background: #fff !important; font-size: 7.5px !important; margin: 0 !important; padding: 0 !important; }
-    body.capturing #resultRoot { columns: 2 !important; column-gap: 8px !important; width: 1060px !important; max-width: none !important; padding: 16px 20px !important; box-sizing: border-box !important; }
-    body.capturing .type-hero { column-span: all !important; padding: 7px 12px 6px !important; margin-bottom: 5px !important; }
-    body.capturing .result-section { break-inside: avoid !important; margin: 0 0 4px !important; }
-    body.capturing .result-card { box-shadow: none !important; border: 1px solid #ddd !important; padding: 5px 7px !important; margin: 0 !important; }
-    body.capturing .section-title { font-size: 0.58rem !important; }
-    body.capturing .type-desc, body.capturing .strength-reason, body.capturing .reason-box,
-    body.capturing .env-card-text, body.capturing .advisor-text, body.capturing .skill-reason,
-    body.capturing .selfpr-card { font-size: 0.58rem !important; line-height: 1.45 !important; }
-    body.capturing .strength-item { padding: 3px 6px !important; margin-bottom: 2px !important; }
-    body.capturing .strength-name { font-size: 0.65rem !important; }
-    body.capturing .tag-job, body.capturing .tag-industry, body.capturing .culture-chip { font-size: 0.55rem !important; padding: 1px 5px !important; }
-    body.capturing .radar-wrap svg { max-width: 160px !important; }
-    body.capturing .radar-wrap { padding: 0 !important; }
-    body.capturing .env-card { padding: 4px 6px !important; }
-    body.capturing .skill-item { padding: 3px 6px !important; font-size: 0.62rem !important; }
+    /* PDF撮影用コンテナ */
+    #pdfCapture { font-size: 7.5px; background: #f5f6fa; width: 1080px; }
+    #pdfCapture .result-card { box-shadow: none !important; border: 1px solid #ddd !important; padding: 5px 7px !important; margin: 0 !important; }
+    #pdfCapture .result-section { margin: 0 0 4px !important; padding: 0 !important; }
+    #pdfCapture .section-title { font-size: 0.58rem !important; padding-bottom: 3px !important; margin-bottom: 4px !important; }
+    #pdfCapture .type-desc, #pdfCapture .strength-reason, #pdfCapture .reason-box,
+    #pdfCapture .env-card-text, #pdfCapture .advisor-text, #pdfCapture .skill-reason,
+    #pdfCapture .selfpr-card { font-size: 0.58rem !important; line-height: 1.45 !important; }
+    #pdfCapture .strength-item { padding: 3px 6px !important; margin-bottom: 2px !important; }
+    #pdfCapture .strength-name { font-size: 0.65rem !important; }
+    #pdfCapture .tag-job, #pdfCapture .tag-industry, #pdfCapture .culture-chip { font-size: 0.55rem !important; padding: 1px 5px !important; }
+    #pdfCapture .env-card { padding: 4px 6px !important; }
+    #pdfCapture .skill-item { padding: 3px 6px !important; font-size: 0.62rem !important; }
+    #pdfCapture .type-hero { padding: 8px 14px 6px !important; margin-bottom: 6px !important; }
+    #pdfCapture .selfpr-copy-btn { display: none !important; }
 
     @media print {
       @page { size: 297mm 210mm; margin: 5mm 7mm; }
@@ -1256,6 +1251,16 @@ function render(typeId) {
   `;
 }
 
+async function svgToDataUrl(svgEl) {
+  const xml = new XMLSerializer().serializeToString(svgEl);
+  const blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.readAsDataURL(blob);
+  });
+}
+
 async function handleDownload() {
   const isLineApp = /Line\//i.test(navigator.userAgent);
   if (isLineApp) {
@@ -1263,47 +1268,78 @@ async function handleDownload() {
     return;
   }
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (isMobile) {
-    window.print();
-    return;
-  }
+  if (isMobile) { window.print(); return; }
 
   const btn = document.querySelector('.download-btn');
   btn.textContent = '生成中... お待ちください';
   btn.disabled = true;
 
+  let wrap = null;
   try {
-    // 2カラム横向きレイアウトで撮影
-    document.body.classList.add('capturing');
-    const target = document.getElementById('resultRoot');
-    await new Promise(r => setTimeout(r, 300)); // レイアウト反映待ち
+    // SVGをimg要素に変換
+    const svgEl = document.querySelector('#resultRoot svg');
+    const radarSrc = svgEl ? await svgToDataUrl(svgEl) : null;
 
-    const canvas = await html2canvas(target, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#f5f6fa',
-      width: 1060,
-      windowWidth: 1060
+    // 隠しPDFコンテナ生成
+    wrap = document.createElement('div');
+    wrap.id = 'pdfCapture';
+    wrap.style.cssText = 'position:fixed;top:-99999px;left:0;z-index:-1;';
+
+    // ヒーロー（全幅）
+    wrap.appendChild(document.querySelector('.type-hero').cloneNode(true));
+
+    // 左右カラム
+    const cols = document.createElement('div');
+    cols.style.cssText = 'display:flex;gap:8px;padding:6px 10px;align-items:flex-start;';
+    const L = document.createElement('div');
+    L.style.cssText = 'flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;';
+    const R = document.createElement('div');
+    R.style.cssText = 'flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;';
+
+    const sections = [...document.querySelectorAll('#resultRoot .result-section')];
+    sections.forEach((s, i) => {
+      const clone = s.cloneNode(true);
+      // SVG → img 置換
+      if (radarSrc) {
+        const svg = clone.querySelector('svg');
+        if (svg) {
+          const img = document.createElement('img');
+          img.src = radarSrc;
+          img.style.cssText = 'width:100%;max-width:150px;display:block;margin:4px auto;';
+          svg.parentNode.replaceChild(img, svg);
+        }
+      }
+      (i < 4 ? L : R).appendChild(clone);
     });
 
-    document.body.classList.remove('capturing');
+    cols.appendChild(L);
+    cols.appendChild(R);
+    wrap.appendChild(cols);
+    document.body.appendChild(wrap);
+
+    await new Promise(r => setTimeout(r, 500));
+
+    const canvas = await html2canvas(wrap, {
+      scale: 2, useCORS: true, allowTaint: true, logging: false,
+      backgroundColor: '#f5f6fa', width: 1080, windowWidth: 1080
+    });
+
+    document.body.removeChild(wrap);
+    wrap = null;
 
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const pdfW = pdf.internal.pageSize.getWidth();
     const pdfH = pdf.internal.pageSize.getHeight();
     const ratio = canvas.width / canvas.height;
-    let imgW = pdfW - 10;
-    let imgH = imgW / ratio;
-    if (imgH > pdfH - 6) {
-      imgH = pdfH - 6;
-      imgW = imgH * ratio;
-    }
-    pdf.addImage(canvas.toDataURL('image/jpeg', 0.93), 'JPEG', (pdfW - imgW) / 2, (pdfH - imgH) / 2, imgW, imgH);
+    let imgW = pdfW - 4, imgH = imgW / ratio;
+    if (imgH > pdfH - 4) { imgH = pdfH - 4; imgW = imgH * ratio; }
+    pdf.addImage(canvas.toDataURL('image/jpeg', 0.93), 'JPEG',
+      (pdfW - imgW) / 2, (pdfH - imgH) / 2, imgW, imgH);
     pdf.save('career-diagnosis.pdf');
+
   } catch (e) {
-    document.body.classList.remove('capturing');
+    if (wrap) { try { document.body.removeChild(wrap); } catch(_) {} }
     window.print();
   } finally {
     btn.textContent = '↓ 診断結果をPDFで保存（A4横・1枚）';
