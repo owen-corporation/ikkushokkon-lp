@@ -1295,20 +1295,25 @@ async function handleDownload() {
     wrap.style.cssText = 'position:fixed;top:-99999px;left:0;z-index:-1;background:#fff;';
 
     // ヒーロー（全幅）
-    wrap.appendChild(document.querySelector('.type-hero').cloneNode(true));
+    const heroClone = document.querySelector('.type-hero').cloneNode(true);
+    heroClone.style.cssText = 'width:100%;box-sizing:border-box;';
+    wrap.appendChild(heroClone);
 
-    // 左右カラム
+    // 左右カラム（パディングなし、全幅）
     const cols = document.createElement('div');
-    cols.style.cssText = 'display:flex;gap:8px;padding:6px 10px;align-items:flex-start;';
+    cols.style.cssText = 'display:flex;gap:6px;padding:5px 6px;align-items:flex-start;box-sizing:border-box;width:100%;';
     const L = document.createElement('div');
     L.style.cssText = 'flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;';
     const R = document.createElement('div');
     R.style.cssText = 'flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;';
 
+    // 左: レーダー・タイプ詳細・強みTOP3・変換・職種業界(0-4)
+    // 右: 企業規模・社風・環境・スキル・アドバイザー・自己PR(5+)
     const sections = [...document.querySelectorAll('#resultRoot .result-section')];
     sections.forEach((s, i) => {
       const clone = s.cloneNode(true);
-      // SVG → PNG img 置換（読み込み待ち）
+      clone.style.cssText = 'margin:0 0 4px;padding:0;';
+      // SVG → PNG img 置換
       if (radarSrc) {
         const svg = clone.querySelector('svg');
         if (svg) {
@@ -1318,7 +1323,7 @@ async function handleDownload() {
           svg.parentNode.replaceChild(img, svg);
         }
       }
-      (i < 4 ? L : R).appendChild(clone);
+      (i < 5 ? L : R).appendChild(clone);
     });
 
     cols.appendChild(L);
@@ -1342,13 +1347,12 @@ async function handleDownload() {
 
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-    const pdfW = pdf.internal.pageSize.getWidth();
-    const pdfH = pdf.internal.pageSize.getHeight();
-    const ratio = canvas.width / canvas.height;
-    let imgW = pdfW - 4, imgH = imgW / ratio;
-    if (imgH > pdfH - 4) { imgH = pdfH - 4; imgW = imgH * ratio; }
+    const pdfW = pdf.internal.pageSize.getWidth(); // 297mm
+    const pdfH = pdf.internal.pageSize.getHeight(); // 210mm
+    // A4いっぱいに広げる（余白3mm）
+    const margin = 3;
     pdf.addImage(canvas.toDataURL('image/jpeg', 0.93), 'JPEG',
-      (pdfW - imgW) / 2, (pdfH - imgH) / 2, imgW, imgH);
+      margin, margin, pdfW - margin * 2, pdfH - margin * 2);
     pdf.save('career-diagnosis.pdf');
 
   } catch (e) {
