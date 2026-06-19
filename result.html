@@ -527,11 +527,10 @@
       -webkit-tap-highlight-color: transparent;
     }
     .download-btn:hover { background: var(--navy); color: #fff; }
-    @media (hover: hover) { .download-mobile-tip { display: none; } }
 
     /* ── Print: A4縦 1〜2枚 ── */
     @media print {
-      @page { size: A4 landscape; margin: 8mm 10mm; }
+      @page { size: 297mm 210mm; margin: 8mm 10mm; }
 
       .top-bar, .type-switcher-wrap, .cta-wrap, footer,
       .download-section, .selfpr-copy-btn { display: none !important; }
@@ -1186,10 +1185,7 @@ function render(typeId) {
       <button class="download-btn" onclick="handleDownload()">
         ↓ 診断結果をPDFで保存（A4横・1〜2枚）
       </button>
-      <p class="download-mobile-tip" style="margin-top:8px; font-size:0.78rem; color:#888; text-align:center;">
-        📱 スマホの方はまず横向きにしてからボタンを押してください
-      </p>
-      <p class="download-mobile-note" style="display:none; margin-top:10px; font-size:0.8rem; color:#e55; text-align:center;">
+<p class="download-mobile-note" style="display:none; margin-top:10px; font-size:0.8rem; color:#e55; text-align:center;">
         LINEアプリ内ではPDFを保存できません。<br>
         画面右下の「・・・」→「ブラウザで開く」を押して<br>
         Safari・Chrome・Yahooブラウザで開き直してください。
