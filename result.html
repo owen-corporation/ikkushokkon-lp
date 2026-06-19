@@ -1184,13 +1184,30 @@ function render(typeId) {
     <!-- Download PDF -->
     <div class="download-section">
       <button class="download-btn" onclick="handleDownload()">
-        ↓ 診断結果をPDFで保存（A4横・1〜2枚）
+        ↓ 診断結果をPDFで保存（A4横・1枚）
       </button>
       <p class="download-mobile-note" style="display:none; margin-top:10px; font-size:0.8rem; color:#e55; text-align:center;">
         LINEアプリ内ではPDFを保存できません。<br>
         画面右下の「・・・」→「ブラウザで開く」を押して<br>
         Safari・Chrome・Yahooブラウザで開き直してください。
       </p>
+    </div>
+
+    <!-- Print guide overlay -->
+    <div id="printGuide" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:9999; align-items:center; justify-content:center;">
+      <div style="background:#fff; border-radius:14px; padding:28px 28px 22px; max-width:340px; width:90%; text-align:left; line-height:1.8; font-size:0.88rem;">
+        <div style="font-size:1.1rem; font-weight:700; margin-bottom:12px; text-align:center;">📄 1枚でPDF保存する方法</div>
+        <ol style="margin:0; padding-left:1.4em; color:#333;">
+          <li>印刷ダイアログが開いたら<br>「<strong>その他の設定</strong>」を開く</li>
+          <li>「<strong>ヘッダーとフッター</strong>」の<br>チェックを外す</li>
+          <li>「<strong>送信先</strong>」を「PDFに保存」にする</li>
+          <li>「<strong>保存</strong>」をクリック</li>
+        </ol>
+        <button onclick="document.getElementById('printGuide').style.display='none'; window.print();"
+          style="margin-top:18px; width:100%; padding:12px; background:#1B3A6B; color:#fff; border:none; border-radius:8px; font-size:0.95rem; font-weight:700; cursor:pointer;">
+          印刷ダイアログを開く →
+        </button>
+      </div>
     </div>
 
 
@@ -1238,7 +1255,12 @@ function handleDownload() {
     document.querySelector('.download-mobile-note').style.display = 'block';
     return;
   }
-  window.print();
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    window.print();
+  } else {
+    document.getElementById('printGuide').style.display = 'flex';
+  }
 }
 
 function copySelfPR() {
