@@ -1186,9 +1186,9 @@ function render(typeId) {
         ↓ 診断結果をPDFで保存（A4横・1〜2枚）
       </button>
       <p class="download-mobile-note" style="display:none; margin-top:10px; font-size:0.8rem; color:#666; text-align:center;">
-        📱 スマホでPDFを保存するには<br>
-        Safariで開き直して「共有 → PDFを保存」をお試しください。<br>
-        またはPCからアクセスするとダウンロードできます。
+        LINEアプリ内ではPDFを保存できません。<br>
+        画面右下の「・・・」→「ブラウザで開く」を押して<br>
+        Safari・Chrome・Yahooブラウザで開き直してください。
       </p>
     </div>
 
@@ -1231,8 +1231,8 @@ function render(typeId) {
 }
 
 function handleDownload() {
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (isMobile) {
+  const isLineApp = /Line\//i.test(navigator.userAgent);
+  if (isLineApp) {
     document.querySelector('.download-mobile-note').style.display = 'block';
   } else {
     window.print();
