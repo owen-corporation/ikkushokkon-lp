@@ -530,12 +530,17 @@
 
     /* ── Print: A4縦 1〜2枚 ── */
     @media print {
-      @page { size: 297mm 210mm; margin: 6mm 8mm; }
+      @page { size: 297mm 210mm; margin: 5mm 7mm; }
 
       .top-bar, .type-switcher-wrap, .cta-wrap, footer,
       .download-section, .selfpr-copy-btn { display: none !important; }
 
-      body { max-width: none; background: #fff; font-size: 8px; }
+      body { max-width: none; background: #fff; font-size: 7.5px; }
+
+      /* レーダーチャートを小さく */
+      .radar-wrap svg { max-width: 160px !important; }
+      .radar-wrap { padding: 0 !important; }
+      .radar-score-row { margin-top: 2px !important; }
 
       /* 2カラム */
       #resultRoot { columns: 2; column-gap: 8px; }
