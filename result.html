@@ -646,6 +646,8 @@
       margin-bottom: 6px;
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -1193,22 +1195,6 @@ function render(typeId) {
       </p>
     </div>
 
-    <!-- Print guide overlay -->
-    <div id="printGuide" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:9999; align-items:center; justify-content:center;">
-      <div style="background:#fff; border-radius:14px; padding:28px 28px 22px; max-width:340px; width:90%; text-align:left; line-height:1.8; font-size:0.88rem;">
-        <div style="font-size:1.1rem; font-weight:700; margin-bottom:12px; text-align:center;">📄 1枚でPDF保存する方法</div>
-        <ol style="margin:0; padding-left:1.4em; color:#333;">
-          <li>印刷ダイアログが開いたら<br>「<strong>その他の設定</strong>」を開く</li>
-          <li>「<strong>ヘッダーとフッター</strong>」の<br>チェックを外す</li>
-          <li>「<strong>送信先</strong>」を「PDFに保存」にする</li>
-          <li>「<strong>保存</strong>」をクリック</li>
-        </ol>
-        <button onclick="document.getElementById('printGuide').style.display='none'; window.print();"
-          style="margin-top:18px; width:100%; padding:12px; background:#1B3A6B; color:#fff; border:none; border-radius:8px; font-size:0.95rem; font-weight:700; cursor:pointer;">
-          印刷ダイアログを開く →
-        </button>
-      </div>
-    </div>
 
 
     <!-- Type switcher -->
@@ -1249,7 +1235,7 @@ function render(typeId) {
   `;
 }
 
-function handleDownload() {
+async function handleDownload() {
   const isLineApp = /Line\//i.test(navigator.userAgent);
   if (isLineApp) {
     document.querySelector('.download-mobile-note').style.display = 'block';
@@ -1258,8 +1244,51 @@ function handleDownload() {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (isMobile) {
     window.print();
-  } else {
-    document.getElementById('printGuide').style.display = 'flex';
+    return;
+  }
+
+  const btn = document.querySelector('.download-btn');
+  btn.textContent = '生成中... お待ちください';
+  btn.disabled = true;
+
+  try {
+    const target = document.getElementById('resultRoot');
+
+    // 非表示要素を一時的に隠す
+    const hideEls = document.querySelectorAll('.type-switcher-wrap, .cta-wrap, footer, .download-section');
+    hideEls.forEach(el => el.style.visibility = 'hidden');
+
+    const canvas = await html2canvas(target, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#f5f6fa'
+    });
+
+    hideEls.forEach(el => el.style.visibility = '');
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+    const pdfW = pdf.internal.pageSize.getWidth();
+    const pdfH = pdf.internal.pageSize.getHeight();
+    const ratio = canvas.width / canvas.height;
+    let imgW = pdfW - 14;
+    let imgH = imgW / ratio;
+    if (imgH > pdfH - 10) {
+      imgH = pdfH - 10;
+      imgW = imgH * ratio;
+    }
+    const x = (pdfW - imgW) / 2;
+    const y = (pdfH - imgH) / 2;
+
+    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', x, y, imgW, imgH);
+    pdf.save('career-diagnosis.pdf');
+  } catch (e) {
+    window.print();
+  } finally {
+    btn.textContent = '↓ 診断結果をPDFで保存（A4横・1枚）';
+    btn.disabled = false;
   }
 }
 
