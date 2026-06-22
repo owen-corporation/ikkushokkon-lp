@@ -530,20 +530,23 @@
 
     /* ── Print: A4縦 1〜2枚 ── */
     /* PDF撮影用コンテナ */
-    #pdfCapture { font-size: 7.5px; background: #fff; width: 1080px; }
-    #pdfCapture .result-card { box-shadow: none !important; border: 1px solid #ddd !important; padding: 5px 7px !important; margin: 0 !important; }
-    #pdfCapture .result-section { margin: 0 0 4px !important; padding: 0 !important; }
-    #pdfCapture .section-title { font-size: 0.58rem !important; padding-bottom: 3px !important; margin-bottom: 4px !important; }
-    #pdfCapture .type-desc, #pdfCapture .strength-reason, #pdfCapture .reason-box,
-    #pdfCapture .env-card-text, #pdfCapture .advisor-text, #pdfCapture .skill-reason,
-    #pdfCapture .selfpr-card { font-size: 0.58rem !important; line-height: 1.45 !important; }
-    #pdfCapture .strength-item { padding: 3px 6px !important; margin-bottom: 2px !important; }
-    #pdfCapture .strength-name { font-size: 0.65rem !important; }
-    #pdfCapture .tag-job, #pdfCapture .tag-industry, #pdfCapture .culture-chip { font-size: 0.55rem !important; padding: 1px 5px !important; }
-    #pdfCapture .env-card { padding: 4px 6px !important; }
-    #pdfCapture .skill-item { padding: 3px 6px !important; font-size: 0.62rem !important; }
-    #pdfCapture .type-hero { padding: 8px 14px 6px !important; margin-bottom: 6px !important; }
+    #pdfCapture { font-size: 8px; background: #fff; width: 1080px; }
+    #pdfCapture .result-card { box-shadow: none !important; border: 1px solid #ddd !important; padding: 5px 8px !important; margin: 0 !important; }
+    #pdfCapture .result-section { margin: 0 0 5px !important; padding: 0 !important; }
+    #pdfCapture .section-title { font-size: 0.62rem !important; padding-bottom: 3px !important; margin-bottom: 4px !important; }
+    #pdfCapture .type-desc { font-size: 0.6rem !important; line-height: 1.5 !important; }
+    #pdfCapture .strength-reason, #pdfCapture .reason-box,
+    #pdfCapture .env-card-text, #pdfCapture .skill-reason { display: none !important; }
+    #pdfCapture .advisor-card, #pdfCapture .selfpr-section { display: none !important; }
+    #pdfCapture .strength-item { padding: 3px 8px !important; margin-bottom: 3px !important; }
+    #pdfCapture .strength-name { font-size: 0.7rem !important; }
+    #pdfCapture .tag-job, #pdfCapture .tag-industry, #pdfCapture .culture-chip { font-size: 0.6rem !important; padding: 2px 6px !important; }
+    #pdfCapture .env-card { padding: 5px 8px !important; }
+    #pdfCapture .env-card-title { font-size: 0.62rem !important; }
+    #pdfCapture .skill-item { padding: 3px 8px !important; font-size: 0.65rem !important; }
+    #pdfCapture .type-hero { padding: 10px 16px 8px !important; margin-bottom: 6px !important; }
     #pdfCapture .selfpr-copy-btn { display: none !important; }
+    #pdfCapture .type-name { font-size: 1.6rem !important; }
 
     @media print {
       @page { size: 297mm 210mm; margin: 5mm 7mm; }
@@ -1349,10 +1352,14 @@ async function handleDownload() {
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const pdfW = pdf.internal.pageSize.getWidth(); // 297mm
     const pdfH = pdf.internal.pageSize.getHeight(); // 210mm
-    // A4いっぱいに広げる（余白3mm）
     const margin = 3;
+    const maxW = pdfW - margin * 2;
+    const maxH = pdfH - margin * 2;
+    const ratio = canvas.width / canvas.height;
+    let imgW = maxW, imgH = maxW / ratio;
+    if (imgH > maxH) { imgH = maxH; imgW = maxH * ratio; }
     pdf.addImage(canvas.toDataURL('image/jpeg', 0.93), 'JPEG',
-      margin, margin, pdfW - margin * 2, pdfH - margin * 2);
+      margin + (maxW - imgW) / 2, margin + (maxH - imgH) / 2, imgW, imgH);
     pdf.save('career-diagnosis.pdf');
 
   } catch (e) {
