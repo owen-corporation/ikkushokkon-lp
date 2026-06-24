@@ -1205,7 +1205,7 @@ function render(typeId) {
     <!-- Download PDF -->
     <div class="download-section">
       <button class="download-btn" onclick="handleDownload()">
-        ↓ 診断結果をPDFで保存（A4横・1枚）
+        ↓ 診断結果をPDFで保存
       </button>
       <p class="download-mobile-note" style="display:none; margin-top:10px; font-size:0.8rem; color:#e55; text-align:center;">
         LINEアプリ内ではPDFを保存できません。<br>
@@ -1304,9 +1304,10 @@ async function handleDownload() {
     titleBar.textContent = `強み診断レポート｜${typeName}タイプ`;
     wrap.appendChild(titleBar);
 
-    // ヒーロー（全幅）
+    // ヒーロー（全幅・背景グラデーション保持）
     const heroClone = document.querySelector('.type-hero').cloneNode(true);
-    heroClone.style.cssText = 'width:100%;box-sizing:border-box;';
+    heroClone.style.width = '100%';
+    heroClone.style.boxSizing = 'border-box';
     wrap.appendChild(heroClone);
 
     // 左右カラム（パディングなし、全幅）
@@ -1317,10 +1318,12 @@ async function handleDownload() {
     const R = document.createElement('div');
     R.style.cssText = 'flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;';
 
-    // 左: レーダー・タイプ詳細・強みTOP3・変換・職種業界(0-4)
-    // 右: 企業規模・社風・環境・スキル・アドバイザー・自己PR(5+)
+    // 左: レーダー・タイプ詳細・強みTOP3・変換(0-3)
+    // 右: 職種業界・企業規模・社風・環境・スキル(4-8)
+    // 除外: AIアドバイザー・自己PR(9以降)
     const sections = [...document.querySelectorAll('#resultRoot .result-section')];
     sections.forEach((s, i) => {
+      if (i >= 9) return; // アドバイザー・自己PRはPDF除外
       const clone = s.cloneNode(true);
       clone.style.cssText = 'margin:0 0 4px;padding:0;';
       // SVG → PNG img 置換
@@ -1333,7 +1336,7 @@ async function handleDownload() {
           svg.parentNode.replaceChild(img, svg);
         }
       }
-      (i < 5 ? L : R).appendChild(clone);
+      (i < 4 ? L : R).appendChild(clone);
     });
 
     cols.appendChild(L);
@@ -1373,7 +1376,7 @@ async function handleDownload() {
     if (wrap) { try { document.body.removeChild(wrap); } catch(_) {} }
     window.print();
   } finally {
-    btn.textContent = '↓ 診断結果をPDFで保存（A4横・1枚）';
+    btn.textContent = '↓ 診断結果をPDFで保存';
     btn.disabled = false;
   }
 }
