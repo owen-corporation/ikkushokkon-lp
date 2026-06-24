@@ -1297,6 +1297,13 @@ async function handleDownload() {
     wrap.id = 'pdfCapture';
     wrap.style.cssText = 'position:fixed;top:-99999px;left:0;z-index:-1;background:#fff;';
 
+    // タイトル
+    const typeName = document.querySelector('.type-name')?.textContent?.trim() || '';
+    const titleBar = document.createElement('div');
+    titleBar.style.cssText = 'width:100%;box-sizing:border-box;background:#f0f4fa;padding:8px 18px;font-size:0.75rem;font-weight:700;color:#1B3A6B;border-bottom:2px solid #1B3A6B;letter-spacing:0.05em;';
+    titleBar.textContent = `強み診断レポート｜${typeName}タイプ`;
+    wrap.appendChild(titleBar);
+
     // ヒーロー（全幅）
     const heroClone = document.querySelector('.type-hero').cloneNode(true);
     heroClone.style.cssText = 'width:100%;box-sizing:border-box;';
